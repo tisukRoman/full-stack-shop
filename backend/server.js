@@ -1,29 +1,52 @@
+const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
-const products = require('./data/products');
 const connectDB = require('./config/db');
+const productRoutes = require('./routes/productRoutes');
+const userRoutes = require('./routes/userRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
+const { notFound, errorHander } = require('./middleWare/errorMiddleware');
 
-dotenv.config(); // GLOBAL CONSTANTS 
+// GLOBAL CONSTANTS
+dotenv.config();
 
-connectDB(); // ASYNC CONNECTING TO MONGO_DB
+// CONNECTING TO MONGO_DB
+connectDB();
 
-const app = express(); // CREATING SERVER
+// CREATING SERVER
+const app = express();
 
-//--------------------------// APIs
-app.get('/', (req, res) => { 
-    res.send('API is running...');
-});
+// ALLOWS USING JSON PARSER
+app.use(express.json());
 
-app.get('/api/products', (req, res) => {
-    res.json(products);
-});
+// API ROUTES
+app.use('/api/products', productRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/upload', uploadRoutes)
 
-app.get('/api/products/:id', (req, res) => {
-    const product = products.find(p => p._id === req.params.id);
-    res.json(product);
-});
+app.get('/api/config/paypal', (req, res) => res.send(process.env.PAYPAL_CLIENT_ID))
 
+// MAKING UPLOAD DIR STATIC
+/* __dirname = path.resolve(); */
+app.use('/uploads', express.static(path.join('./', '/uploads')))
 
+// PRODUCTION SETTINGS
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '/frontend/build')))
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'))
+    })
+}
+
+// ERROR HANDLERS
+app.use(notFound);
+app.use(errorHander);
+
+// SERVER RUNNING
 const PORT = process.env.PORT || 5000
-app.listen(PORT, console.log(`Server is running on port ${PORT}`));
+app.listen(PORT, console.log(`Server is running on port ${PORT}`)); // SERVER LISTENING
+
 

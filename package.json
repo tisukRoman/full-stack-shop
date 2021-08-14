@@ -14,10 +14,18 @@
   "author": "tisukroman@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "@glidejs/glide": "^3.4.1",
     "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "mongoose": "^5.13.3"
+    "express-async-handler": "^1.1.4",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.3",
+    "multer": "^1.4.2",
+    "react-glidejs": "^1.0.8",
+    "react-helmet": "^6.1.0",
+    "swiper": "^6.8.1"
   },
   "devDependencies": {
     "concurrently": "^6.2.0",

@@ -1,44 +1,66 @@
-import React, { useState, useEffect } from 'react'
-import { Product } from '../Components/Product'
-import { makeStyles, Typography, Container, Backdrop, CircularProgress } from '@material-ui/core'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Product } from '../components/Product'
+import { makeStyles, Typography, Container } from '@material-ui/core'
+import { listProducts } from '../actions/productActions';
+import { Error } from '../components/Error'
+import { Preloader } from '../components/Preloader'
+import { Pagination } from '@material-ui/lab';
+import { Carousel } from '../components/Carousel';
+import { Meta } from './../components/Meta';
 
 const useStyles = makeStyles((theme) => ({
     productList: {
-        padding: '1em',
+        padding: '2em',
         width: '90%',
         margin: '0 auto',
         display: 'flex',
         justifyContent: 'flex-start',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
     },
     productTitle: {
         padding: '2.5em',
         fontWeight: 'bold',
         color: 'grey'
+    },
+    error: {
+        padding: '2.5em',
+        fontWeight: 'bold',
+        color: 'red'
+    },
+    pagination: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '30em',
+        margin: '3em auto 0 auto',
     }
 }));
 
-export const MainScreen = () => {
+export const MainScreen = ({ match, history }) => {
 
-    const classes = useStyles()
-    const [products, setProducts] = useState([]);
+    const keyword = match.params.keyword;
+    const currentPage = match.params.pageNumber || 1;
+
+    const classes = useStyles();
+    const dispatch = useDispatch();
+    const { pageNumber, pageCount, products, loading, error } = useSelector(state => state.productList);
+
+    const [page, setPage] = useState(pageNumber);
 
     useEffect(() => {
-        const getProducts = async () => {
-            const { data } = await axios.get('/api/products')
-            setProducts(data)
+        if (!keyword?.trim()) {
+            history.push(`/page/${page}`);
         }
-        getProducts()
-    }, [])
+        dispatch(listProducts(keyword, page));
+    }, [dispatch, keyword, currentPage, history, page])
 
 
-    if (!products) {
-        return <Backdrop className={classes.backdrop} open={true}>
-            <CircularProgress color="inherit" />
-        </Backdrop>
-    }
     return (<>
+        <Meta />
+        {error && <Error error={error} />}
+        {(loading || !products) && <Preloader />}
+        {!keyword && <Carousel />}
         <Typography variant='h5' className={classes.productTitle}>LATEST PRODUCTS</Typography>
         <Container className={classes.productList}>
             {products?.map(p => <Product
@@ -50,7 +72,15 @@ export const MainScreen = () => {
                 rating={p.rating}
                 numReviews={p.numReviews}
             />)}
+
         </Container>
+
+        <div className={classes.pagination}>
+            <Pagination
+                size="large"
+                onChange={(e, v) => setPage(v)}
+                count={pageCount} />
+        </div>
     </>
     )
 }

@@ -6,6 +6,7 @@ const connectDB = require('./config/db');
 const Product = require('./models/productModel');
 const User = require('./models/userModel')
 const Order = require('./models/orderModel');
+const colors = require('colors');
 
 dotenv.config();    
 
@@ -21,13 +22,13 @@ const importData = async () => {
 
         const adminUser = createdUsers[0]._id;
 
-        const sampleProducts = products.map(p => {
-            return { ...products, user: adminUser }
+        const sampleProducts = products.map(product => {
+            return { ...product, user: adminUser }
         });
 
         await Product.insertMany(sampleProducts);
 
-        console.log('Data is imported!!!');
+        console.log('Data is imported!!!'.cyan.underline);
         process.exit();
 
     } catch (err) {
@@ -42,7 +43,7 @@ const destroyData = async () => {
         await Product.deleteMany();
         await User.deleteMany();
 
-        console.log('Data is destroyed!!!');
+        console.log('Data is destroyed!!!'.cyan.underline);
         process.exit();
 
     } catch (err) {

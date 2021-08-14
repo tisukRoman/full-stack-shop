@@ -1,25 +1,29 @@
-import { Card, Typography, makeStyles, CardMedia, CardContent } from '@material-ui/core'
+import { Card, Typography, makeStyles, CardContent } from '@material-ui/core'
 import { RatingComp } from './Rating'
 import { Link } from 'react-router-dom'
 
 
 const useStyles = makeStyles((theme) => ({
     card: {
+        transition: '0.3s',
         width: '18em',
-        margin: '1em',
+        margin: '0.5em',
+        '&:hover':{
+            transform: 'scale(1.02)',
+        },
         '&:active': {
-            transition: '0.3s',
             boxShadow: 'none'
         }
     },
     media: {
+        textAlign: 'center',
         position: 'relative',
         overflow: 'hidden',
-        width: '100%',
-        height: '18em',
+        height: '12em',
+        maxWidth: '100%'
     },
     name: {
-        height: '4em',
+        height: '4.5em',
         marginTop: '1em',
         color: 'black',
         fontWeight: 'bold',
@@ -41,13 +45,13 @@ export const Product = ({ id, name, image, price, rating, numReviews }) => {
     const classes = useStyles();
 
     return (
-        <Card className={classes.card} raised={true}>
+        <Card className={classes.card} >
             <Link to={`/product/${id}`}>
                 <CardContent>
-                    <CardMedia
+                    <img
                         className={classes.media}
-                        image={image}
-                        title={name}
+                        src={image}
+                        alt={name}
                     />
                     <Typography
                         variant="body2"
@@ -61,7 +65,7 @@ export const Product = ({ id, name, image, price, rating, numReviews }) => {
                         color="textSecondary"
                         component="div"
                         className={classes.rating}>
-                        <RatingComp numReviews={numReviews} value={rating} />
+                        <RatingComp readOnly={true} numReviews={numReviews} value={rating} />
                     </Typography>
                     <Typography
                         variant="body2"
